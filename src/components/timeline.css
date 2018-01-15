@@ -1,0 +1,14 @@
+#timeline-container {
+
+}
+
+.timeline-box {
+    fill : #fff;
+    stroke:red;
+}
+
+.timeline-box:hover {
+    stroke:black;
+    cursor:pointer;
+}
+

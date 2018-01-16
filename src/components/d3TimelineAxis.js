@@ -4,7 +4,6 @@ import * as d3Scale from 'd3-scale';
 import * as d3Time from 'd3-time';
 
 const axisFactory = (domElement, data, width, height) => {
-
     const scale = d3Scale.scaleTime()
         .domain(data)
         .range([5, width-5]);

@@ -12,8 +12,8 @@ class TimelineAxis extends Component {
 
     render() {
         return (
-            <div id="timeline-axis">
-            </div>
+            <span id="timeline-axis">
+            </span>
         )
     }
 }

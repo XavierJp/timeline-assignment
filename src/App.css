@@ -1,0 +1,10 @@
+#timeline-container {
+    display:flex;
+    flex-direction: column;
+}
+
+#app-container {
+    user-select: none;
+    display:flex;
+    flex-direction: column;
+}

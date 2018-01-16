@@ -22,7 +22,7 @@ class Timeline extends Component {
     }
 
     render() {
-        const { width, height, trials, getDate } = this.props;
+        const { width, height, trials } = this.props;
         return (
             <svg id="timeline" width={width} height={height}>
                 {

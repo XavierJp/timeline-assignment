@@ -2,11 +2,13 @@
   "name": "timeline",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://XavierJp.github.io/timeline-assignment",
   "dependencies": {
     "d3-axis": "^1.0.8",
     "d3-scale": "^1.0.7",
     "d3-selection": "^1.2.0",
     "d3-time": "^1.0.8",
+    "gh-pages": "^1.1.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-scripts": "1.1.0"
@@ -15,6 +17,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy" : "npm run build&&gh-pages -d build"
   }
 }

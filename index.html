@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name="theme-color" content="#000000"><link rel="manifest" href="/timeline-assignment/manifest.json"><title>Timeline Assignment</title><link href="/timeline-assignment/static/css/main.cab20483.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><h1>Trial timeline</h1><div id="root"></div><div><div id="input-error-area"></div><textarea id="trial-input-area" name="textarea" rows="10" cols="40" placeholder="Please enter new trials">
+      [
+  { "start": 5, "end": 50, "title": "Event #1" },
+  { "start": 55, "end": 85, "title": "Event #2" },
+  { "start": 65, "end": 195, "title": "Event #3" },
+  { "start": 90, "end": 180, "title": "Event #4" }
+]
+    </textarea></div><script type="text/javascript">const input = document.getElementById('trial-input-area');
+      const error = document.getElementById('input-error-area');
+
+      // listen for any changes in the text input and render clinical trial
+      input.addEventListener("keyup", ()=>{
+        error.style.display = 'none';
+        let values = [];
+        try {
+          if (input.value !== '')
+            values = JSON.parse(input.value);
+        }
+        catch (e) {
+          error.innerHTML = 'Error while parsing JSON : '+e;
+          error.style.display = 'block';
+        }
+
+        try {
+          if (values.length>0)
+            window.renderClinicalTrials(values);
+        }
+        catch (e) {
+          error.innerHTML = 'Error while rendering trials : '+e;
+          error.style.display = 'block';
+          throw e;
+        }
+      });</script><script type="text/javascript" src="/timeline-assignment/static/js/main.0b06a9fd.js"></script></body></html>

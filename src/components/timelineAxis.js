@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 
 import axisFactory from './d3TimelineAxis.js';
 
+// Wrapper on top of D3 axis
+
 class TimelineAxis extends Component {
     componentDidMount () {
         const el = ReactDOM.findDOMNode(this);

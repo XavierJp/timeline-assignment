@@ -3,6 +3,7 @@ import * as d3Select from 'd3-selection';
 import * as d3Scale from 'd3-scale';
 import * as d3Time from 'd3-time';
 
+// D3 implementation of the axis
 const axisFactory = (domElement, datesBounds, width, height) => {
     const scale = d3Scale.scaleTime()
         .domain(datesBounds)

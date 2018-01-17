@@ -1,6 +1,6 @@
 
 
-/* CORE algo : main logic is here **/
+/* CORE algo : main computation logic belongs here **/
 
 const timelineFactory = (trials) => {
 
@@ -29,55 +29,68 @@ const timelineFactory = (trials) => {
 
     // compute simultaneous trials
     for(let trialId=0; trialId<trialsWithMetaData.length; trialId++) {
-       const currentTrial = trialsWithMetaData[trialId];
+        const currentTrial = trialsWithMetaData[trialId];
 
-       const simultaneousTrials = trialsWithMetaData.filter(trial => {
-            if(trial.start >= currentTrial.start && trial.start <= currentTrial.end)
-                return true;
-
-            if(trial.end >= currentTrial.start && trial.end <= currentTrial.end)
-                return true;
-            return false;
-        }).filter(trial=>trial.id!==currentTrial.id)
-
-        for (let i=0; i< simultaneousTrials.length; i++)
-            simultaneousTrials[i].simultaneousTrials.push(currentTrial);
+        for(let i = 0; i<trialsWithMetaData.length; i++) {
+            const trial = trialsWithMetaData[i];
+            if(trial.id!==currentTrial.id) {
+                if((trial.start >= currentTrial.start && trial.start < currentTrial.end)
+                   || (trial.end > currentTrial.start && trial.end <= currentTrial.end)) {
+                    trial.simultaneousTrials.push(currentTrial);
+                }
+            }
+        }
     };
 
-    trialsWithMetaData.map(c=>console.log(c.title +' | '+ c.simultaneousTrials.length))
-    // compute rowTotal
+    // compute row orders
+    for(let trialIdx = 0; trialIdx<trialsWithMetaData.length; trialIdx++) {
+        const currentTrial = trialsWithMetaData[trialIdx];
+
+        if(currentTrial.simultaneousTrials.length === 0)
+            continue;
+
+        currentTrial.simultaneousTrials.sort(orderByDate);
+
+        const occupiedRowIdx = currentTrial.simultaneousTrials.filter(c=>c.rowIdx!==0).map(c=>c.rowIdx).sort();
+
+        if(occupiedRowIdx.length ===0) {
+            currentTrial.rowIdx = 1;
+        } else {
+            occupiedRowIdx.reduce((prevRow, nextRow)=> {
+                if (prevRow + 1 < nextRow)
+                    currentTrial.rowIdx = prevRow +1;
+                return nextRow
+            }, 0);
+
+            if (currentTrial.rowIdx===0)
+                currentTrial.rowIdx = occupiedRowIdx[occupiedRowIdx.length-1]+1;
+        }
+    }
+
+
+    // compute rowTotal & coordinates
     for(let trialId=0; trialId<trialsWithMetaData.length; trialId++) {
         const currentTrial = trialsWithMetaData[trialId];
 
         currentTrial.simultaneousTrials.sort(orderByDate);
+
+        if(currentTrial.rowIdx === 0) // no simultaneous trials
+            continue;
 
         // if more than one row => compute number of row
         if(currentTrial.rowTotal === 0) {
             const rowTotal = getRowTotalReccursive(currentTrial, currentTrial.rowIdx);
             setRowTotalReccursive(currentTrial, rowTotal);
         }
-    };
-
-    // compute rowIdx and coordinates
-    for(let trialIdx = 0; trialIdx<trialsWithMetaData.length; trialIdx++) {
-        const currentTrial = trialsWithMetaData[trialIdx];
-
-        if(currentTrial.rowIdx>0 || currentTrial.rowTotal === 0)
-            continue;
-
-        const simultaneousTrialsPosition = currentTrial.simultaneousTrials.map(c=>c.rowIdx);
-
-        for (let i =1; i<=currentTrial.rowTotal; i++) {
-            if(currentTrial.rowIdx === 0 && simultaneousTrialsPosition.indexOf(i) === -1) {
-                currentTrial.rowIdx = i;
-            }
-        }
 
         const rowHeight = (currentTrial.y[1] - currentTrial.y[0])/currentTrial.rowTotal;
         const startHeight = currentTrial.y[0]+rowHeight*(currentTrial.rowIdx-1);
 
         currentTrial.y = [startHeight, startHeight+rowHeight];
-    }
+    };
+
+    // uncomment this line to display the repartitions results
+    //trialsWithMetaData.map(c=>console.log(c.title +' | position '+ c.rowIdx +' | total '+ c.rowTotal))
 
     timeline.trials = trialsWithMetaData;
 
@@ -89,7 +102,7 @@ const timelineFactory = (trials) => {
 // parse all the simultaneous trial to get the max number of simultaneous trial
 const getRowTotalReccursive = (trial, max)=>{
     trial.markUp = 1;
-    const m = Math.max(max, trial.simultaneousTrials.length);
+    const m = Math.max(max, trial.rowIdx);
     const trialsToParse = trial.simultaneousTrials.filter(c=>c.start>=trial.start).filter(c=>c.markUp!==1);
     if(trialsToParse.length===0)
         return m;

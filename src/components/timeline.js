@@ -2,6 +2,8 @@ import './timeline.css';
 import React, { Component } from 'react';
 import * as d3Scale from 'd3-scale';
 
+/** Displays trials **/
+
 class Timeline extends Component {
     constructor(props) {
         super(props);
@@ -34,7 +36,7 @@ class Timeline extends Component {
                         return(
                             <TimelineBox
                                 key={index}
-                                width={this.scaleX(trial.x[1])-this.scaleX(trial.x[0])}
+                                width={this.scaleX(trial.x[1])-this.scaleX(trial.x[0])-2}
                                 height={Math.max(this.scaleY(trial.y[1])-this.scaleY(trial.y[0])-5, 1)}
                                 x={this.scaleX(trial.x[0])}
                                 y={this.scaleY(trial.y[0])}
@@ -49,6 +51,8 @@ class Timeline extends Component {
     }
 }
 
+
+// Render at trial item
 const TimelineBox = (props) => (
     <g className='timeline-box-container'>
         <rect

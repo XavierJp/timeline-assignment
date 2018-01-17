@@ -4,11 +4,14 @@ import Timeline from './components/timeline.js';
 import TimelineAxis from './components/timelineAxis.js';
 import timelineFactory, { getDate } from './timelineCore.js';
 
+// the App - triggers rendering for both Timeline and Timeline-Axis.
+// Expose the renderClinicalTrials function to the global namespace
+
 class App extends Component {
     constructor() {
         super();
 
-        window.updateTimeLine = (trials) => {
+        window.renderClinicalTrials = (trials) => {
             this.setState({...timelineFactory(trials)});
         };
 

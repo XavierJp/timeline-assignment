@@ -21,6 +21,10 @@ class Timeline extends Component {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.scaleX.domain(nextProps.boundaries);
+    }
+
     render() {
         const { width, height, trials } = this.props;
         return (
@@ -31,7 +35,7 @@ class Timeline extends Component {
                             <TimelineBox
                                 key={index}
                                 width={this.scaleX(trial.x[1])-this.scaleX(trial.x[0])}
-                                height={this.scaleY(trial.y[1])-this.scaleY(trial.y[0])-5}
+                                height={Math.max(this.scaleY(trial.y[1])-this.scaleY(trial.y[0])-5, 1)}
                                 x={this.scaleX(trial.x[0])}
                                 y={this.scaleY(trial.y[0])}
                                 title={trial.title}
@@ -61,12 +65,16 @@ const TimelineBox = (props) => (
             y={props.y}
             className='timeline-title-container'
         />
-        <text x={props.x+10}
-            y={props.y+15}
-            className='timeline-title-text'>{props.title}</text>
-        <text x={props.x+10}
-            y={props.y+35}
-            className='timeline-date'>{props.startDate+' - '+props.endDate}</text>
+        {  props.height > 20 &&
+            <text x={props.x+10}
+                y={props.y+15}
+                className='timeline-title-text'>{props.title}</text>
+        }
+        { props.height > 35 &&
+            <text x={props.x+10}
+                y={props.y+35}
+                className='timeline-date'>{props.startDate+' - '+props.endDate}</text>
+        }
     </g>
 )
 

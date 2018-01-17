@@ -11,9 +11,12 @@ const timelineFactory = (trials) => {
     timeline.boundariesAsDates = getDateBoundaries(timeline.boundaries);
 
     /** TRIALS : COMPUTE SIMULTANEOUS TRIALS **/
-
     // compute list of simultaneous trial
     const trialsWithMetaData = trials.sort(orderByDate).map((trial,index)=> {
+        //basic check
+        if (trial.start > trial.end)
+            throw Error(`Start value cannot be superior to End value : ${JSON.stringify(trial)}`);
+
         return  Object.assign({}, trial, {
                 id : index, // unique trial identifier, ordered by date
                 x : [trial.start, trial.end],
@@ -28,7 +31,7 @@ const timelineFactory = (trials) => {
     for(let trialId=0; trialId<trialsWithMetaData.length; trialId++) {
        const currentTrial = trialsWithMetaData[trialId];
 
-       currentTrial.simultaneousTrials = trialsWithMetaData.filter(trial => {
+       const simultaneousTrials = trialsWithMetaData.filter(trial => {
             if(trial.start >= currentTrial.start && trial.start <= currentTrial.end)
                 return true;
 
@@ -36,8 +39,12 @@ const timelineFactory = (trials) => {
                 return true;
             return false;
         }).filter(trial=>trial.id!==currentTrial.id)
+
+        for (let i=0; i< simultaneousTrials.length; i++)
+            simultaneousTrials[i].simultaneousTrials.push(currentTrial);
     };
 
+    trialsWithMetaData.map(c=>console.log(c.title +' | '+ c.simultaneousTrials.length))
     // compute rowTotal
     for(let trialId=0; trialId<trialsWithMetaData.length; trialId++) {
         const currentTrial = trialsWithMetaData[trialId];
@@ -46,7 +53,7 @@ const timelineFactory = (trials) => {
 
         // if more than one row => compute number of row
         if(currentTrial.rowTotal === 0) {
-            const rowTotal = getRowTotalReccursive(currentTrial.simultaneousTrials, currentTrial.start, currentTrial.rowIdx);
+            const rowTotal = getRowTotalReccursive(currentTrial, currentTrial.rowIdx);
             setRowTotalReccursive(currentTrial, rowTotal);
         }
     };
@@ -80,20 +87,21 @@ const timelineFactory = (trials) => {
 /** UTILS FUNCTION **/
 
 // parse all the simultaneous trial to get the max number of simultaneous trial
-const getRowTotalReccursive = (trials, start, max)=>{
-    return trials.reduce((acc, trial)=>{
-        if(trials.length===0)
-            return max;
-        const m = Math.max(max, trial.simultaneousTrials.length);
-        const trialToParse = trial.simultaneousTrials.filter(c=>c.start<start);
-        return Math.max(getRowTotalReccursive(trialToParse,trial.start,m),m);
-    },0)
+const getRowTotalReccursive = (trial, max)=>{
+    trial.markUp = 1;
+    const m = Math.max(max, trial.simultaneousTrials.length);
+    const trialsToParse = trial.simultaneousTrials.filter(c=>c.start>=trial.start).filter(c=>c.markUp!==1);
+    if(trialsToParse.length===0)
+        return m;
+    return Math.max(...trialsToParse.map(trialToParse=> getRowTotalReccursive(trialToParse,m)));
 }
 
 // reccursively set the row total number
 const setRowTotalReccursive = (trial, rowTotal)=>{
-    trial.rowTotal = rowTotal;
-    trial.simultaneousTrials.filter(c=>c.start<trial.start).map(c=>setRowTotalReccursive(c, rowTotal))
+    if (trial.rowTotal === 0) {
+        trial.rowTotal = rowTotal;
+        trial.simultaneousTrials.map(c=>setRowTotalReccursive(c, rowTotal))
+    }
 }
 
 // turn the boundaries as number into boundaries as date

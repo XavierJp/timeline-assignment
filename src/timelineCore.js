@@ -30,12 +30,10 @@ const timelineFactory = (trials) => {
     // compute simultaneous trials
     for(let trialId=0; trialId<trialsWithMetaData.length; trialId++) {
         const currentTrial = trialsWithMetaData[trialId];
-
         for(let i = 0; i<trialsWithMetaData.length; i++) {
             const trial = trialsWithMetaData[i];
             if(trial.id!==currentTrial.id) {
-                if((trial.start >= currentTrial.start && trial.start < currentTrial.end)
-                   || (trial.end > currentTrial.start && trial.end <= currentTrial.end)) {
+                if(isSimultaneous(trial, currentTrial)) {
                     trial.simultaneousTrials.push(currentTrial);
                 }
             }
@@ -90,7 +88,7 @@ const timelineFactory = (trials) => {
     };
 
     // uncomment this line to display the repartitions results
-    //trialsWithMetaData.map(c=>console.log(c.title +' | position '+ c.rowIdx +' | total '+ c.rowTotal))
+    //trialsWithMetaData.map(c=>console.log(c.title +' | position '+ c.rowIdx +' | total '+ c.rowTotal+' | simultan '+ c.simultaneousTrials.length))
 
     timeline.trials = trialsWithMetaData;
 
@@ -125,6 +123,16 @@ const getDateBoundaries = (bounds) => {
 export const getDate = (dateAsNumber) => {
     const initialDate = new Date(2000, 1,1);
     return (new Date(initialDate)).setMonth(initialDate.getMonth()+dateAsNumber);
+}
+
+const isSimultaneous = (trialA,trialB) => {
+    if (trialA.end < trialB.start)
+        return false;
+
+    if (trialA.start > trialB.end)
+        return false;
+
+    return true;
 }
 
 // orderBy date
